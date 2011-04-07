@@ -33,7 +33,11 @@ cdef class Interval:
     @property
     def name(self):
         return self._bed.name.c_str()
-        
+
+    @property
+    def score(self):
+        return self._bed.score.c_str()
+
     @property
     def strand(self):
         return self._bed.strand.c_str()
@@ -59,7 +63,7 @@ cdef class Interval:
         return self._bed.o_end - self._bed.o_start
 
     def __repr__(self):
-        return "Interval(%s:%i..%i)" % (self._bed.chrom.c_str(), self._bed.start, self._bed.end)
+        return self._bed.reportBed().c_str()
 
     def __dealloc__(self):
         del self._bed
@@ -67,7 +71,9 @@ cdef class Interval:
 
 cdef Interval create_interval(BED b):
     cdef Interval pyb = Interval.__new__(Interval)
-    pyb._bed = new BED(b.chrom, b.start, b.end, b.name, b.score, b.strand, b.otherFields, b.o_start, b.o_end)
+    pyb._bed = new BED(b.chrom, b.start, b.end, b.name, 
+                       b.score, b.strand, b.otherFields, 
+                       b.o_start, b.o_end, b.bedType, b.isGff, b.isVcf, b.status)
     return pyb
 
 
@@ -86,6 +92,10 @@ cdef list bed_vec2list(vector[BED] bv):
         b = bv.at(i)
         l.append(create_interval(b))
     return l
+
+
+def overlap(int s1, int s2, int e1, int e2):
+    return min(e1,e2) - max(s1,s2)
 
 
 cdef class IntervalFile:
@@ -121,7 +131,6 @@ cdef class IntervalFile:
         if self._loaded: return
         self.intervalFile_ptr.loadBedFileIntoMap()
         self._loaded = 1
-
             
     def all_hits(self, Interval interval, bool same_strand = False, float ovlp_pct = 0.0):
         """
@@ -143,6 +152,7 @@ cdef class IntervalFile:
             finally:
                 pass
 
+    # search() is an alias for all_hits
     search = all_hits
 
     def any_hits(self, Interval interval, bool same_strand = False, float ovlp_pct = 0.0):
@@ -160,7 +170,6 @@ cdef class IntervalFile:
 
         return found
 
-        
     def count_hits(self, Interval interval, bool same_strand = False, float ovlp_pct = 0.0):
         """
         Search for the "bed" feature in this file and return the *** count of hits found ***
@@ -171,4 +180,3 @@ cdef class IntervalFile:
            return self.intervalFile_ptr.CountOverlapsPerBin(deref(interval._bed), ovlp_pct)
         else:
            return self.intervalFile_ptr.CountOverlapsPerBin(deref(interval._bed), same_strand, ovlp_pct)
-           

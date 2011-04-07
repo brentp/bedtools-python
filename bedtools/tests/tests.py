@@ -14,7 +14,6 @@ class IntervalFileTest(unittest.TestCase):
     def testOverlaps(self):
         i    = Interval("chr21", 9719768, 9739768)
         hits = self.bed.all_hits(i)
-        print len(hits)
         self.assertEqual(len(hits), 8)
         for hit in hits:
             self.assert_(hit.start <= 9739768 and hit.end >= 9719768)

@@ -25,7 +25,11 @@ bedtools-python
     python setup.py install
     ./test.sh
     # Try it out
-    ./example-intersect.py
+    examples/ex0-echo.py
+    examples/ex1-intersect.py
+    examples/ex2-pysam-and-bedtools.py
+    examples/ex3-fasta-from-bed.py
+    examples/ex4-window.py
 
 ----------------
 3. The API
@@ -35,20 +39,19 @@ Still need to document this.
 ---------------
 4. Examples
 ---------------
-4a. Intersect one file against another (akin to intersectBed)
---------------------------------------------------------------
 
+Below is a brief example to whet your appetite.  For more details on how to use the API, check out the examples/ directory.
 ::
 
-    >>> from bedtools import IntervalFile
-    >>> 
-    >>> 
-    >>> exons = IntervalFile("bedtools/tests/data/exons.hg18.chr21.bed")
-    >>> rmsk  = IntervalFile("bedtools/tests/data/rmsk.hg18.chr21.bed")
-    >>> 
-    >>> # find exons that overlap with repeat annotations
-    >>> ex = exons.next()
-    >>> for hit in rmsk.search(ex):
-    ...      print ex.chrom,  ex.start,  ex.end,\
-    ...            hit.chrom, hit.start, hit.end,
-    chr21 9928613 9928911 chr21 9928614 9928678
+  >>> from bedtools import IntervalFile
+  >>>
+  >>>
+  >>> exons = IntervalFile("bedtools/tests/data/exons.hg18.chr21.bed")
+  >>> rmsk  = IntervalFile("bedtools/tests/data/rmsk.hg18.chr21.bed")
+  >>>
+  >>> # find exons that overlap with repeat annotations
+  >>> ex = exons.next()
+  >>> for hit in rmsk.search(ex):
+  ...      print ex.chrom,  ex.start,  ex.end,\
+  ...            hit.chrom, hit.start, hit.end,
+  chr21 9928613 9928911 chr21 9928614 9928678
